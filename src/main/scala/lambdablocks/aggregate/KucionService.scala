@@ -12,12 +12,12 @@ import com.typesafe.scalalogging.StrictLogging
 import lambdablocks.aggregate.utils.AuthenticationHeaders
 
 
-trait HelloWorld[F[_]]{
-  def getUser(n: HelloWorld.Name): F[HelloWorld.Greeting]
+trait KucoinService[F[_]]{
+  def getAccounts(n: KucoinService.Name): F[KucoinService.Greeting]
 }
 
-object HelloWorld extends StrictLogging with AuthenticationHeaders {
-  implicit def apply[F[_]](implicit ev: HelloWorld[F]): HelloWorld[F] = ev
+object KucoinService extends StrictLogging with AuthenticationHeaders {
+  implicit def apply[F[_]](implicit ev: KucoinService[F]): KucoinService[F] = ev
 
   final case class Name(name: String) extends AnyVal
   final case class ApiError(e: Throwable) extends RuntimeException
@@ -49,11 +49,11 @@ object HelloWorld extends StrictLogging with AuthenticationHeaders {
 
   }
 
-  def impl[F[_]: Concurrent](C: Client[F]): HelloWorld[F] = new HelloWorld[F]{
+  def impl[F[_]: Concurrent](C: Client[F]): KucoinService[F] = new KucoinService[F]{
     val dsl = new Http4sClientDsl[F]{}
     import dsl._
 
-    def getUser(n: HelloWorld.Name): F[HelloWorld.Greeting] = {
+    def getAccounts(n: KucoinService.Name): F[KucoinService.Greeting] = {
       val requestType = "GET"
       val uri = "https://api.kucoin.com"
       val endpoint = "/api/v1/accounts?currency=BTC"

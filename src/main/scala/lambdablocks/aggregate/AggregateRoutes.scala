@@ -20,15 +20,15 @@ object AggregateRoutes extends StrictLogging{
     }
   }
 
-  def helloWorldRoutes[F[_]: Sync](H: HelloWorld[F]): HttpRoutes[F] = {
+  def kucoinServiceRoutes[F[_]: Sync](H: KucoinService[F]): HttpRoutes[F] = {
     val dsl = new Http4sDsl[F]{}
     import dsl._
     import cats.syntax.applicativeError._
     HttpRoutes.of[F] {
       case GET -> Root / "hello" / name =>
-        Ok(H.getUser(HelloWorld.Name(name)).handleError(err => {
+        Ok(H.getAccounts(KucoinService.Name(name)).handleError(err => {
           logger.error(err.getMessage, err)
-          HelloWorld.Greeting("500 error")
+          KucoinService.Greeting("500 error")
         }))
     }
   }

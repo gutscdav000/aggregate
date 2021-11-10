@@ -14,7 +14,7 @@ object AggregateServer {
   def stream[F[_]: Async]: Stream[F, Nothing] = {
     for {
       client <- Stream.resource(EmberClientBuilder.default[F].build)
-      helloWorldAlg = HelloWorld.impl[F](client)
+      kucoinServiceAlg = KucoinService.impl[F](client)
       jokeAlg = Jokes.impl[F](client)
 
       // Combine Service Routes into an HttpApp.
@@ -22,7 +22,7 @@ object AggregateServer {
       // want to extract a segments not checked
       // in the underlying routes.
       httpApp = (
-        AggregateRoutes.helloWorldRoutes[F](helloWorldAlg) <+>
+        AggregateRoutes.kucoinServiceRoutes[F](kucoinServiceAlg) <+>
         AggregateRoutes.jokeRoutes[F](jokeAlg)
       ).orNotFound
 
