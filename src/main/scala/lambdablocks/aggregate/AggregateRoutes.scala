@@ -2,10 +2,11 @@ package lambdablocks.aggregate
 
 import cats.effect.Sync
 import cats.implicits._
+import com.typesafe.scalalogging.StrictLogging
 import org.http4s.HttpRoutes
 import org.http4s.dsl.Http4sDsl
 
-object AggregateRoutes {
+object AggregateRoutes extends StrictLogging{
 
   def jokeRoutes[F[_]: Sync](J: Jokes[F]): HttpRoutes[F] = {
     val dsl = new Http4sDsl[F]{}
@@ -22,12 +23,13 @@ object AggregateRoutes {
   def helloWorldRoutes[F[_]: Sync](H: HelloWorld[F]): HttpRoutes[F] = {
     val dsl = new Http4sDsl[F]{}
     import dsl._
+    import cats.syntax.applicativeError._
     HttpRoutes.of[F] {
       case GET -> Root / "hello" / name =>
-        for {
-          greeting <- H.hello(HelloWorld.Name(name))
-          resp <- Ok(greeting)
-        } yield resp
+        Ok(H.getUser(HelloWorld.Name(name)).handleError(err => {
+          logger.error(err.getMessage, err)
+          HelloWorld.Greeting("500 error")
+        }))
     }
   }
 }
