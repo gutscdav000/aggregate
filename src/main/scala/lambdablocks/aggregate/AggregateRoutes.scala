@@ -28,7 +28,7 @@ object AggregateRoutes extends StrictLogging{
       case GET -> Root / "accounts" / name =>
         Ok(H.getAccounts(KucoinService.Name(name)).handleError(err => {
           logger.error(err.getMessage, err)
-          KucoinService.Greeting("500 error")
+          KucoinService.AccountResponse("500 error" , Nil)
         }))
     }
   }
