@@ -4,6 +4,7 @@ import cats.effect.{Async, Resource}
 import cats.syntax.all._
 import com.comcast.ip4s._
 import fs2.Stream
+import lambdablocks.aggregate.kucoin.{KucoinRepository, KucoinService}
 import org.http4s.ember.client.EmberClientBuilder
 import org.http4s.ember.server.EmberServerBuilder
 import org.http4s.implicits._
@@ -14,7 +15,8 @@ object AggregateServer {
   def stream[F[_]: Async]: Stream[F, Nothing] = {
     for {
       client <- Stream.resource(EmberClientBuilder.default[F].build)
-      kucoinServiceAlg = KucoinService.impl[F](client)
+      kucoinRepo = KucoinRepository.impl[F](client)
+      kucoinServiceAlg = KucoinService.impl[F](kucoinRepo)
       jokeAlg = Jokes.impl[F](client)
 
       // Combine Service Routes into an HttpApp.

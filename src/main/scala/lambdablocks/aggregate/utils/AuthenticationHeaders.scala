@@ -8,6 +8,8 @@ import com.typesafe.config.ConfigFactory
 import org.typelevel.ci._
 
 trait AuthenticationHeaders {
+  private val conf = ConfigFactory.parseResources("application.conf").resolve()
+
   def getUnixTimestamp(): String = System.currentTimeMillis().toString
 
   def getUri(uri: String): Uri = Uri.fromString(uri).fold(_ => sys.error(s"Failure on uri: $uri"), identity)
@@ -21,7 +23,6 @@ trait AuthenticationHeaders {
   }
 
   def getKucoinHeaders(requestType: String, endpoint: String, body: String): Headers = {
-    val conf = ConfigFactory.parseResources("application.conf").resolve()
 
     val apiKey = conf.getString("prod.kucoinKey")
     val secret = conf.getString("prod.kucoinSecret")

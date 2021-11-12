@@ -3,6 +3,7 @@ package lambdablocks.aggregate
 import cats.effect.Sync
 import cats.implicits._
 import com.typesafe.scalalogging.StrictLogging
+import lambdablocks.aggregate.kucoin.KucoinService
 import org.http4s.HttpRoutes
 import org.http4s.dsl.Http4sDsl
 
@@ -23,11 +24,12 @@ object AggregateRoutes extends StrictLogging{
   def kucoinServiceRoutes[F[_]: Sync](H: KucoinService[F]): HttpRoutes[F] = {
     val dsl = new Http4sDsl[F]{}
     import dsl._
-    import cats.syntax.applicativeError._
+
     HttpRoutes.of[F] {
       case GET -> Root / "accounts" / name =>
-        Ok(H.getAccounts(KucoinService.Name(name)).handleError(err => {
+        Ok(H.getAccounts().handleError(err => {
           logger.error(err.getMessage, err)
+          logger.info(name)
           KucoinService.AccountResponse("500 error" , Nil)
         }))
     }
